@@ -1,0 +1,15 @@
+# --- Core ---
+streamlit>=1.36
+pandas>=2.2
+openpyxl>=3.1
+
+# --- ODS (pandas -> odf engine) ---
+odfpy>=1.4.1
+
+# --- HTML parsing dla read_html ---
+lxml>=4.9
+html5lib>=1.1
+beautifulsoup4>=4.12
+
+# --- Konwersja .xls -> .xlsx (czysty Python, bez Excela) ---
+xlrd>=2.0.1
