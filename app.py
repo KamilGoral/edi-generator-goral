@@ -157,21 +157,31 @@ def ensure_unique_columns(df: pd.DataFrame) -> pd.DataFrame:
 ALIASES = {
     "produkt": ["produkt", "nazwa", "nazwa towaru"],
     "kod_ean": ["kod ean", "ean", "ean produktu", "kod", "gtin"],
-    "cena": ["cena zakupu netto", "cena netto", "cena"],
+    "cena": ["cena zakupu netto", "cena netto", "cena", "zakup"],
     "dystrybutor": ["dystrybutor", "dystrybutorzy", "dostawca", "dystrybucja", "dystrybucja:"],
     "vat": ["vat", "stawka vat"],  # opcjonalne
 }
 
 def find_cols(df: pd.DataFrame) -> dict:
     found = {k: None for k in ALIASES.keys()}
+    # Pass 1: exact matches only (prevents "EAN opakowania kaucyjnego" stealing "EAN")
     for col in df.columns:
         ck = norm_key(col)
         for key, aliases in ALIASES.items():
             if found[key] is not None:
                 continue
             for a in aliases:
-                ak = norm_key(a)
-                if ck == ak or ak in ck:
+                if ck == norm_key(a):
+                    found[key] = col
+                    break
+    # Pass 2: substring matches for remaining unmatched keys
+    for col in df.columns:
+        ck = norm_key(col)
+        for key, aliases in ALIASES.items():
+            if found[key] is not None:
+                continue
+            for a in aliases:
+                if norm_key(a) in ck:
                     found[key] = col
                     break
     return found
